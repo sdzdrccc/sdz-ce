@@ -12,6 +12,7 @@ use std::ptr;
 
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::*;
+use windows::Win32::Graphics::Dwm::*;
 use windows::Win32::Graphics::Gdi::*;
 use windows::Win32::System::Diagnostics::Debug::*;
 use windows::Win32::System::LibraryLoader::*;
@@ -24,65 +25,65 @@ use windows::Win32::UI::Shell::*;
 use windows::Win32::UI::WindowsAndMessaging::*;
 
 // ---------------- 布局常量 ----------------
-const WIN_W: i32 = 960;
-const WIN_H: i32 = 540;
+const WIN_W: i32 = 480;
+const WIN_H: i32 = 270;
 
-const SIDE_W: i32 = 92;
-const SIDE_H1: i32 = 24;
-const SIDE_H2: i32 = 88;
-const SIDE_H3: i32 = 152;
-const SIDE_H4: i32 = 216;
+const SIDE_W: i32 = 46;
+const SIDE_H1: i32 = 12;
+const SIDE_H2: i32 = 44;
+const SIDE_H3: i32 = 76;
+const SIDE_H4: i32 = 108;
 
-const MENU_X0: i32 = 896;
-const MENU_X1: i32 = 924;
-const CLOSE_X0: i32 = 930;
-const CLOSE_X1: i32 = 958;
-const TOP_Y0: i32 = 12;
-const TOP_Y1: i32 = 44;
+const MENU_X0: i32 = 448;
+const MENU_X1: i32 = 462;
+const CLOSE_X0: i32 = 465;
+const CLOSE_X1: i32 = 479;
+const TOP_Y0: i32 = 6;
+const TOP_Y1: i32 = 22;
 
-const RING_CX: i32 = 526;
-const RING_CY: i32 = 148;
-const RING_R: i32 = 62;
-const STATUS_Y: i32 = 236;
+const RING_CX: i32 = 263;
+const RING_CY: i32 = 74;
+const RING_R: i32 = 31;
+const STATUS_Y: i32 = 122;
 
-const SL_X0: i32 = 266;
-const SL_X1: i32 = 786;
-const SL_Y: i32 = 300;
+const SL_X0: i32 = 133;
+const SL_X1: i32 = 393;
+const SL_Y: i32 = 150;
 
-const LABEL_COLOR_Y: i32 = 352;
-const TOG_LBL_X: i32 = 690;
-const TOG_X: i32 = 770;
-const TOG_Y: i32 = 348;
-const TOG_W: i32 = 46;
-const TOG_H: i32 = 24;
+const LABEL_COLOR_Y: i32 = 176;
+const TOG_LBL_X: i32 = 340;
+const TOG_X: i32 = 388;
+const TOG_Y: i32 = 174;
+const TOG_W: i32 = 23;
+const TOG_H: i32 = 12;
 
-const CIRCLE_Y: i32 = 424;
-const CIRCLE_R: i32 = 16;
-const CIRCLE_XS: [i32; 5] = [306, 416, 526, 636, 746];
-const CAPTION_Y: i32 = 478;
+const CIRCLE_Y: i32 = 212;
+const CIRCLE_R: i32 = 8;
+const CIRCLE_XS: [i32; 5] = [153, 208, 263, 318, 373];
+const CAPTION_Y: i32 = 239;
 
-const HP_ROW1_Y: i32 = 120;
-const HP_ROW2_Y: i32 = 190;
-const HP_ROW3_Y: i32 = 260;
-const HP_VAL_X: i32 = 520;
+const HP_ROW1_Y: i32 = 60;
+const HP_ROW2_Y: i32 = 95;
+const HP_ROW3_Y: i32 = 130;
+const HP_VAL_X: i32 = 260;
 
 // 健康页数值循环
 const REST_VALUES: [u8; 5] = [5, 10, 20, 30, 60];
 const FOCUS_VALUES: [u8; 5] = [10, 20, 30, 45, 60];
 
-// ---------------- 颜色 ----------------
-const TEAL: COLORREF = COLORREF(0x0098A52F); // #2FA598
-const MAIN_BG: COLORREF = COLORREF(0x00F4F4F2);
-const WHITE: COLORREF = COLORREF(0x00FFFFFFFF);
-const TEXT_DARK: COLORREF = COLORREF(0x00333333);
-const TEXT_GRAY: COLORREF = COLORREF(0x008A9094);
-const GREEN: COLORREF = COLORREF(0x006AA63F);
-const RING_BG: COLORREF = COLORREF(0x00E2E4E6);
-const LINE_GRAY: COLORREF = COLORREF(0x00C8CCCC);
-const SL_YEL: COLORREF = COLORREF(0x004AD4EE);
+// ---------------- 颜色（浅黄暖调界面） ----------------
+const TEAL: COLORREF = COLORREF(0x0019A3E9); // #E9A319 琥珀（侧栏/主色）
+const MAIN_BG: COLORREF = COLORREF(0x00E3F6FD); // #FDF6E3 奶油浅黄底
+const WHITE: COLORREF = COLORREF(0x00ECFBFF); // #FFFBEC 暖白
+const TEXT_DARK: COLORREF = COLORREF(0x001E3B4A); // #4A3B1E 深棕
+const TEXT_GRAY: COLORREF = COLORREF(0x005F8A9A); // #9A8A5F 暖灰
+const GREEN: COLORREF = COLORREF(0x004C8A2E); // #2E8A4C
+const RING_BG: COLORREF = COLORREF(0x00C8E4F0); // #F0E4C8 浅黄
+const LINE_GRAY: COLORREF = COLORREF(0x00A8D5E6); // #E6D5A8 暖线
+const SL_YEL: COLORREF = COLORREF(0x00107AC4); // #C47A10 深琥珀（滑条末端）
 const CIRCLE_DARK: COLORREF = COLORREF(0x00141414);
 
-// 色温圆点（0 淡黄 / 1 黄 / 2 绿 / 3 橙红 / 4 黑=关闭）
+// 色温圆点（0 淡黄 / 1 黄 / 2 绿 / 3 橙红 / 4 黑=关闭）—— 真正叠加到屏幕的护眼色，保持不变
 const CIRCLE_COLORS: [COLORREF; 5] = [
     COLORREF(0x00C0E8F7),
     COLORREF(0x003CE0F0),
@@ -107,8 +108,8 @@ const HK_TOGGLE: i32 = 1; // F9
 const HK_BREAK: i32 = 2;  // F8
 const HK_SHOW: i32 = 3;   // F5
 
-const EVENT_LEFTBUTTONUP: u32 = 0x0402;
-const EVENT_RIGHTBUTTONUP: u32 = 0x0405;
+const EVENT_LEFTBUTTONUP: u32 = 0x0202; // WM_LBUTTONUP
+const EVENT_RIGHTBUTTONUP: u32 = 0x0205; // WM_RBUTTONUP
 
 const HUD_TEXT: u32 = 9001;
 
@@ -214,6 +215,7 @@ struct App {
     in_break: bool,
     hud_left: u32,
     mouse_down: bool,
+    drag: Option<(i32, i32)>, // 无边框窗口拖动（按住顶部空白区）
 }
 
 static mut APP: *mut App = ptr::null_mut();
@@ -237,8 +239,9 @@ fn apply_autostart(enable: bool) {
     }
     let sub = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
         .encode_utf16()
+        .chain(std::iter::once(0))
         .collect::<Vec<_>>();
-    let name = "sdz-ce".encode_utf16().collect::<Vec<_>>();
+    let name = "sdz-ce".encode_utf16().chain(std::iter::once(0)).collect::<Vec<_>>();
     unsafe {
         let mut key = HKEY::default();
         let err = RegOpenKeyExW(
@@ -348,16 +351,35 @@ fn tray_data(a: &App) -> NOTIFYICONDATAW {
 }
 
 // ---------------- 调色层（护眼核心） ----------------
+unsafe extern "system" fn wnd_tint(h: HWND, m: u32, w: WPARAM, l: LPARAM) -> LRESULT {
+    // 分层窗的像素内容决定最终叠色：必须在 WM_PAINT 里把整个客户区填成目标色
+    if m == WM_PAINT {
+        let a = &*APP;
+        let color = if !is_tinting(a) {
+            COLORREF(0)
+        } else {
+            CIRCLE_COLORS[a.cfg.temp as usize]
+        };
+        let mut ps = PAINTSTRUCT::default();
+        let hdc = BeginPaint(h, &mut ps);
+        let mut rc = RECT::default();
+        let _ = GetClientRect(h, &mut rc);
+        let _ = FillRect(hdc, &rc, CreateSolidBrush(color));
+        let _ = EndPaint(h, &ps);
+        LRESULT(0)
+    } else {
+        DefWindowProcW(h, m, w, l)
+    }
+}
+
 fn apply_tint(a: &App) {
     let active = is_tinting(a);
     let alpha = if active { a.cfg.intensity } else { 0 };
-    let color = if a.cfg.temp >= 4 {
-        COLORREF(0)
-    } else {
-        CIRCLE_COLORS[a.cfg.temp as usize]
-    };
     unsafe {
-        SetLayeredWindowAttributes(a.tint, color, alpha, LWA_ALPHA).ok();
+        // 颜色画在窗口像素里（wnd_tint 的 WM_PAINT），这里只调透明度；
+        // 先失效客户区触发重绘，新颜色才能生效
+        let _ = InvalidateRect(a.tint, None, TRUE);
+        SetLayeredWindowAttributes(a.tint, COLORREF(0), alpha, LWA_ALPHA).ok();
     }
 }
 
@@ -375,9 +397,9 @@ fn virtual_screen_rect() -> (i32, i32, i32, i32) {
 fn create_tint(a: &mut App) {
     let (vx, vy, vw, vh) = virtual_screen_rect();
     unsafe {
-        let cls = CLASS_TINT.encode_utf16().collect::<Vec<u16>>();
+        let cls = CLASS_TINT.encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
         let wc = WNDCLASSW {
-            lpfnWndProc: Some(wnd_null),
+            lpfnWndProc: Some(wnd_tint),
             hInstance: hinst(),
             lpszClassName: PCWSTR(cls.as_ptr()),
             ..Default::default()
@@ -424,7 +446,7 @@ fn create_hud(a: &mut App) {
         if !a.hud.is_invalid() {
             return;
         }
-        let cls = CLASS_HUD.encode_utf16().collect::<Vec<u16>>();
+        let cls = CLASS_HUD.encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
         let wc = WNDCLASSW {
             lpfnWndProc: Some(wnd_null),
             hInstance: hinst(),
@@ -454,7 +476,7 @@ fn create_hud(a: &mut App) {
         }
         let st = CreateWindowExW(
             WINDOW_EX_STYLE(0),
-            PCWSTR("STATIC".encode_utf16().collect::<Vec<u16>>()[..].as_ptr()),
+            PCWSTR("STATIC".encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>()[..].as_ptr()),
             None,
             WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | 1u32), // SS_CENTER
             0,
@@ -467,7 +489,7 @@ fn create_hud(a: &mut App) {
             None,
         )
         .unwrap_or_default();
-        let face = "Segoe UI".encode_utf16().collect::<Vec<u16>>();
+        let face = "Segoe UI".encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
         let f = CreateFontW(
             -42, 0, 0, 0, 700, 0, 0, 0,
             DEFAULT_CHARSET.0.into(),
@@ -572,7 +594,7 @@ fn tick_idle(a: &mut App) {
 // ---------------- GDI 绘制辅助 ----------------
 fn font_seg_ui(size: i32, weight: i32) -> HFONT {
     unsafe {
-        let face = "Segoe UI".encode_utf16().collect::<Vec<u16>>();
+        let face = "Segoe UI".encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
         CreateFontW(
             -size, 0, 0, 0, weight, 0, 0, 0,
             DEFAULT_CHARSET.0.into(),
@@ -666,7 +688,7 @@ fn draw_main(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_big: HFONT, f_pc
     unsafe {
         fill_rect(hdc, 0, 0, WIN_W, WIN_H, MAIN_BG);
         fill_rect(hdc, 0, 0, SIDE_W, WIN_H, TEAL);
-        fill_rect(hdc, 0, 0, SIDE_W, 48, COLORREF(lerp_color(TEAL.0, 0u32, 0.12)));
+        fill_rect(hdc, 0, 0, SIDE_W, 24, COLORREF(lerp_color(TEAL.0, 0u32, 0.12)));
 
         // 侧栏三项
         let items: [(u8, &str); 3] = [(0, "护眼"), (1, "健康"), (2, "关于")];
@@ -680,22 +702,22 @@ fn draw_main(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_big: HFONT, f_pc
             if active {
                 fill_rect(hdc, 0, y0, SIDE_W, y1 - y0, WHITE);
             }
-            let icx = 26i32;
-            let icy = y0 + 22;
-            let col_pen = if active { TEAL } else { COLORREF(0x00BFE3DC) };
-            let oldp = pen_w(hdc, 2, col_pen);
+            let icx = 13i32;
+            let icy = y0 + 11;
+            let col_pen = if active { TEAL } else { COLORREF(0x004A8AB0) }; // #B08A4A 暖棕
+            let oldp = pen_w(hdc, 1, col_pen);
             match idx {
                 0 => {
-                    let _ = Ellipse(hdc, icx - 10, icy - 7, icx + 10, icy + 7);
-                    let _ = Ellipse(hdc, icx - 3, icy - 3, icx + 3, icy + 3);
+                    let _ = Ellipse(hdc, icx - 5, icy - 4, icx + 5, icy + 4);
+                    let _ = Ellipse(hdc, icx - 2, icy - 2, icx + 2, icy + 2);
                 }
                 1 => {
-                    let _ = Ellipse(hdc, icx - 9, icy - 9, icx + 9, icy + 9);
-                    draw_arc_poly(hdc, icx, icy + 1, 5, 30.0, 120.0);
+                    let _ = Ellipse(hdc, icx - 4, icy - 4, icx + 4, icy + 4);
+                    draw_arc_poly(hdc, icx, icy + 1, 2, 30.0, 120.0);
                 }
                 _ => {
-                    let _ = Ellipse(hdc, icx - 5, icy - 10, icx + 5, icy);
-                    let _ = Ellipse(hdc, icx - 9, icy + 2, icx + 9, icy + 12);
+                    let _ = Ellipse(hdc, icx - 3, icy - 5, icx + 3, icy);
+                    let _ = Ellipse(hdc, icx - 4, icy + 1, icx + 4, icy + 6);
                 }
             }
             let _ = oldp;
@@ -703,22 +725,22 @@ fn draw_main(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_big: HFONT, f_pc
             let t = u16s(label);
             let _ = SetTextColor(hdc, tcol);
             let _ = SetBkMode(hdc, TRANSPARENT);
-            let oldf = SelectObject(hdc, f_med);
-            let _ = TextOutW(hdc, 44, icy - 8, &t);
+            let oldf = SelectObject(hdc, f_small);
+            let _ = TextOutW(hdc, 22, icy - 5, &t);
             let _ = SelectObject(hdc, oldf);
         }
 
         // 右上角 ☰ / ✕
-        let oldp = pen_w(hdc, 2, TEXT_DARK);
+        let oldp = pen_w(hdc, 1, TEXT_DARK);
         for i in 0..3 {
-            let yy = 20 + i * 6;
+            let yy = 9 + i * 4;
             let _ = MoveToEx(hdc, MENU_X0 + 4, yy, None);
             let _ = LineTo(hdc, MENU_X1 - 4, yy);
         }
-        let _ = MoveToEx(hdc, CLOSE_X0 + 4, 18, None);
-        let _ = LineTo(hdc, CLOSE_X1 - 4, 38);
-        let _ = MoveToEx(hdc, CLOSE_X0 + 4, 38, None);
-        let _ = LineTo(hdc, CLOSE_X1 - 4, 18);
+        let _ = MoveToEx(hdc, CLOSE_X0 + 4, 9, None);
+        let _ = LineTo(hdc, CLOSE_X1 - 4, 19);
+        let _ = MoveToEx(hdc, CLOSE_X0 + 4, 19, None);
+        let _ = LineTo(hdc, CLOSE_X1 - 4, 9);
         let _ = oldp;
 
         match a.page {
@@ -735,12 +757,12 @@ fn draw_main(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_big: HFONT, f_pc
     }
 }
 
-fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_pct: HFONT) {
+fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, _f_med: HFONT, f_pct: HFONT) {
     unsafe {
         // 环形百分比
         let active = is_tinting(a);
         let pct = if active { a.cfg.intensity } else { 0 };
-        let oldp = pen_w(hdc, 8, RING_BG);
+        let oldp = pen_w(hdc, 4, RING_BG);
         let _ = Ellipse(
             hdc,
             RING_CX - RING_R,
@@ -750,22 +772,22 @@ fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_pct: HFONT) 
         );
         let _ = oldp;
         if pct > 0 {
-            let oldp2 = pen_w(hdc, 8, TEAL);
+            let oldp2 = pen_w(hdc, 4, TEAL);
             draw_arc_poly(hdc, RING_CX, RING_CY, RING_R, 270.0, 360.0 * (pct as f32) / 100.0);
             let _ = oldp2;
         }
         let pct_s = format!("{}%", a.cfg.intensity);
-        text_center(hdc, f_pct, RING_CX, RING_CY - 20, &pct_s, TEXT_DARK);
+        text_center(hdc, f_pct, RING_CX, RING_CY - 9, &pct_s, TEXT_DARK);
 
         // 状态
         let st = status_text(a);
         let st_col = if active { GREEN } else { TEXT_GRAY };
-        let st_w = text_width(hdc, f_med, st);
-        text_center(hdc, f_med, RING_CX, STATUS_Y, st, st_col);
-        let dotx = RING_CX - st_w / 2 - 16;
+        let st_w = text_width(hdc, f_small, st);
+        text_center(hdc, f_small, RING_CX, STATUS_Y, st, st_col);
+        let dotx = RING_CX - st_w / 2 - 11;
         let ob = CreateSolidBrush(st_col);
         let sb = SelectObject(hdc, ob);
-        let _ = Ellipse(hdc, dotx, STATUS_Y + 8, dotx + 10, STATUS_Y + 18);
+        let _ = Ellipse(hdc, dotx, STATUS_Y + 4, dotx + 5, STATUS_Y + 9);
         let _ = SelectObject(hdc, sb);
         let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
 
@@ -775,6 +797,7 @@ fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_pct: HFONT) 
         let handle_x = SL_X0 + total * val / 100;
         let c0 = TEAL.0;
         let c1 = SL_YEL.0;
+        let th = 5i32; // 轨道高度
         for px in 0..total {
             let x = SL_X0 + px;
             let filled = px <= total * val / 100;
@@ -790,22 +813,22 @@ fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_pct: HFONT) 
             };
             let ob = CreateSolidBrush(col);
             let sb = SelectObject(hdc, ob);
-            let _ = Rectangle(hdc, x, SL_Y - 1, x + 1, SL_Y + 1);
+            let _ = Rectangle(hdc, x, SL_Y - th / 2, x + 1, SL_Y + th / 2 + 1);
             let _ = SelectObject(hdc, sb);
             let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
         }
         // 手柄
         let ob = CreateSolidBrush(WHITE);
         let sb = SelectObject(hdc, ob);
-        let oldp = pen_w(hdc, 2, LINE_GRAY);
-        let _ = Ellipse(hdc, handle_x - 9, SL_Y - 9, handle_x + 9, SL_Y + 9);
+        let oldp = pen_w(hdc, 1, LINE_GRAY);
+        let _ = Ellipse(hdc, handle_x - 6, SL_Y - 6, handle_x + 6, SL_Y + 6);
         let _ = oldp;
         let _ = SelectObject(hdc, sb);
         let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
 
         // 标签
-        draw_text(hdc, f_med, SL_X0, LABEL_COLOR_Y, "颜色调节", TEXT_DARK);
-        draw_text(hdc, f_med, TOG_LBL_X, LABEL_COLOR_Y, "夜间助眠", TEXT_DARK);
+        draw_text(hdc, f_small, SL_X0, LABEL_COLOR_Y, "颜色调节", TEXT_DARK);
+        draw_text(hdc, f_small, TOG_LBL_X, LABEL_COLOR_Y, "夜间助眠", TEXT_DARK);
         draw_toggle(hdc, TOG_X, TOG_Y, a.cfg.auto_time);
 
         // 五个色圆
@@ -845,16 +868,17 @@ fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_pct: HFONT) 
 
 fn draw_toggle(hdc: HDC, x: i32, y: i32, on: bool) {
     unsafe {
+        let knob = TOG_H - 2;
         let bg = if on { TEAL } else { LINE_GRAY };
         let ob = CreateSolidBrush(bg);
         let sb = SelectObject(hdc, ob);
-        let _ = RoundRect(hdc, x, y, x + TOG_W, y + TOG_H, 20, 20);
+        let _ = RoundRect(hdc, x, y, x + TOG_W, y + TOG_H, TOG_H, TOG_H);
         let _ = SelectObject(hdc, sb);
         let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
-        let knobx = if on { x + TOG_W - 20 } else { x + 2 };
+        let knobx = if on { x + TOG_W - knob - 1 } else { x + 1 };
         let ob2 = CreateSolidBrush(WHITE);
         let sb2 = SelectObject(hdc, ob2);
-        let _ = Ellipse(hdc, knobx, y, knobx + 20, y + TOG_H);
+        let _ = Ellipse(hdc, knobx, y + 1, knobx + knob, y + TOG_H - 1);
         let _ = SelectObject(hdc, sb2);
         let _ = DeleteObject(HGDIOBJ(ob2.0 as *mut _));
     }
@@ -862,26 +886,26 @@ fn draw_toggle(hdc: HDC, x: i32, y: i32, on: bool) {
 
 fn draw_value_badge(hdc: HDC, text: &str, x: i32, y: i32, f_small: HFONT) {
     unsafe {
-        let w = text_width(hdc, f_small, text) + 28;
-        let ob = CreateSolidBrush(COLORREF(0x00E6EAEA));
+        let w = text_width(hdc, f_small, text) + 20;
+        let ob = CreateSolidBrush(COLORREF(0x00C8E8F5)); // #F5E8C8 暖黄底
         let sb = SelectObject(hdc, ob);
-        let _ = RoundRect(hdc, x, y - 4, x + w, y + 26, 14, 14);
+        let _ = RoundRect(hdc, x, y - 3, x + w, y + 19, 11, 11);
         let _ = SelectObject(hdc, sb);
         let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
-        draw_text(hdc, f_small, x + 14, y + 1, text, TEXT_DARK);
+        draw_text(hdc, f_small, x + 10, y, text, TEXT_DARK);
     }
 }
 
 fn draw_page_health(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
-    draw_text(hdc, f_med, 200, 80, "健康 · 休息提醒", TEXT_DARK);
-    draw_text(hdc, f_med, 200, HP_ROW1_Y, "休息提醒（20-20-20）", TEXT_DARK);
+    draw_text(hdc, f_med, 100, 40, "健康 · 休息提醒", TEXT_DARK);
+    draw_text(hdc, f_med, 100, HP_ROW1_Y, "休息提醒（20-20-20）", TEXT_DARK);
     draw_toggle(hdc, HP_VAL_X, HP_ROW1_Y - 4, a.cfg.auto_break);
 
-    draw_text(hdc, f_med, 200, HP_ROW2_Y, "休息时长", TEXT_DARK);
+    draw_text(hdc, f_med, 100, HP_ROW2_Y, "休息时长", TEXT_DARK);
     let v = format!("{} 分钟", a.cfg.rest_min);
     draw_value_badge(hdc, &v, HP_VAL_X, HP_ROW2_Y, f_small);
 
-    draw_text(hdc, f_med, 200, HP_ROW3_Y, "专注阈值（无输入多久提醒）", TEXT_DARK);
+    draw_text(hdc, f_med, 100, HP_ROW3_Y, "专注阈值（无输入多久提醒）", TEXT_DARK);
     let v2 = format!("{} 分钟", a.cfg.focus_min);
     draw_value_badge(hdc, &v2, HP_VAL_X, HP_ROW3_Y, f_small);
 
@@ -889,7 +913,7 @@ fn draw_page_health(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
         hdc,
         f_small,
         RING_CX,
-        340,
+        175,
         "点击数值可循环切换：休息 5/10/20/30/60 分钟，阈值 10/20/30/45/60 分钟",
         TEXT_GRAY,
     );
@@ -897,7 +921,7 @@ fn draw_page_health(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
         hdc,
         f_small,
         RING_CX,
-        364,
+        192,
         "提醒时出现全屏倒计时，建议闭眼或远眺 20 秒",
         TEXT_GRAY,
     );
@@ -905,7 +929,7 @@ fn draw_page_health(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
 
 fn draw_page_about(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
     let _ = a;
-    draw_text(hdc, f_med, 200, 90, "sdz-ce 0.1.0", TEXT_DARK);
+    draw_text(hdc, f_med, 100, 46, "sdz-ce 0.1.0", TEXT_DARK);
     let lines = [
         "护眼原理：DWM 暖色调色层（全屏点击穿透分层窗），",
         "不修改系统 gamma 表，进程退出即恢复，零残留。",
@@ -914,9 +938,9 @@ fn draw_page_about(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
         "配置：%APPDATA%\\sdz-ce\\config.ini（纯文本，可手改）",
     ];
     for (i, l) in lines.iter().enumerate() {
-        draw_text(hdc, f_small, 200, 150 + i as i32 * 30, l, TEXT_GRAY);
+        draw_text(hdc, f_small, 100, 80 + i as i32 * 16, l, TEXT_GRAY);
     }
-    text_center(hdc, f_small, RING_CX, 380, "基于 Windows 10/11，普通用户权限运行", TEXT_GRAY);
+    text_center(hdc, f_small, RING_CX, 190, "基于 Windows 10/11，普通用户权限运行", TEXT_GRAY);
 }
 
 // ---------------- 主窗口命中 ----------------
@@ -955,13 +979,13 @@ fn hit_main(a: &App, x: i32, y: i32) -> u32 {
             }
         }
         1 => {
-            if x >= HP_VAL_X - 6 && x <= HP_VAL_X + TOG_W + 6 && y >= HP_ROW1_Y - 10 && y <= HP_ROW1_Y + 34 {
+            if x >= HP_VAL_X - 4 && x <= HP_VAL_X + TOG_W + 4 && y >= HP_ROW1_Y - 6 && y <= HP_ROW1_Y + 12 {
                 return HIT_TOG_BREAK;
             }
-            if x >= HP_VAL_X - 4 && x <= HP_VAL_X + 150 && y >= HP_ROW2_Y - 8 && y <= HP_ROW2_Y + 32 {
+            if x >= HP_VAL_X - 4 && x <= HP_VAL_X + 90 && y >= HP_ROW2_Y - 6 && y <= HP_ROW2_Y + 20 {
                 return HIT_REST;
             }
-            if x >= HP_VAL_X - 4 && x <= HP_VAL_X + 150 && y >= HP_ROW3_Y - 8 && y <= HP_ROW3_Y + 32 {
+            if x >= HP_VAL_X - 4 && x <= HP_VAL_X + 90 && y >= HP_ROW3_Y - 6 && y <= HP_ROW3_Y + 20 {
                 return HIT_FOCUS;
             }
         }
@@ -990,10 +1014,10 @@ unsafe extern "system" fn wnd_main(h: HWND, m: u32, w: WPARAM, l: LPARAM) -> LRE
         WM_PAINT => {
             let mut ps = PAINTSTRUCT::default();
             let hdc = BeginPaint(h, &mut ps);
-            let f_small = font_seg_ui(11, 400);
-            let f_med = font_seg_ui(15, 500);
-            let f_big = font_seg_ui(22, 600);
-            let f_pct = font_seg_ui(30, 700);
+            let f_small = font_seg_ui(9, 400);
+            let f_med = font_seg_ui(11, 500);
+            let f_big = font_seg_ui(14, 600);
+            let f_pct = font_seg_ui(15, 700);
             draw_main(a, hdc, f_small, f_med, f_big, f_pct);
             let _ = ReleaseDC(h, hdc);
             let _ = EndPaint(h, &ps);
@@ -1004,7 +1028,17 @@ unsafe extern "system" fn wnd_main(h: HWND, m: u32, w: WPARAM, l: LPARAM) -> LRE
             let y = ((l.0 >> 16) & 0xFFFF) as i16 as i32;
             let hit = hit_main(a, x, y);
             match hit {
-                HIT_NONE => LRESULT(0),
+                HIT_NONE => {
+                    // 无边框窗口：没命中任何控件的空白处按下 → 屏幕坐标抓取式拖动 + 捕获鼠标
+                    let mut pt = POINT::default();
+                    let _ = GetCursorPos(&mut pt);
+                    let mut r = RECT::default();
+                    GetWindowRect(h, &mut r).ok();
+                    a.drag = Some((pt.x - r.left, pt.y - r.top));
+                    // 捕获鼠标：即使拖出窗口外，松开时 LBUTTONUP 也保证送达本窗口，拖拽标记不会残留
+                    let _ = SetCapture(h);
+                    LRESULT(0)
+                }
                 HIT_PAGE_EYE => {
                     a.page = 0;
                     refresh_main(a);
@@ -1023,6 +1057,10 @@ unsafe extern "system" fn wnd_main(h: HWND, m: u32, w: WPARAM, l: LPARAM) -> LRE
                 HIT_SLIDER => {
                     a.mouse_down = true;
                     a.cfg.intensity = slider_value_from_x(x);
+                    // 处于"关闭"状态时调滑条 → 自动切回默认暖色
+                    if a.cfg.temp == 4 {
+                        a.cfg.temp = 1;
+                    }
                     apply_tint(a);
                     save_cfg(&a.cfg);
                     refresh_main(a);
@@ -1038,6 +1076,10 @@ unsafe extern "system" fn wnd_main(h: HWND, m: u32, w: WPARAM, l: LPARAM) -> LRE
                         }
                     } else if hit == HIT_TOG_NIGHT {
                         a.cfg.auto_time = !a.cfg.auto_time;
+                        // 处于"关闭"（黑点）时开启夜间助眠 → 切回黄色，保证有可见效果
+                        if a.cfg.auto_time && a.cfg.temp == 4 {
+                            a.cfg.temp = 1;
+                        }
                         apply_tint(a);
                         save_cfg(&a.cfg);
                     } else if hit == HIT_MENU {
@@ -1071,16 +1113,45 @@ unsafe extern "system" fn wnd_main(h: HWND, m: u32, w: WPARAM, l: LPARAM) -> LRE
                 let nv = slider_value_from_x(x);
                 if nv != a.cfg.intensity {
                     a.cfg.intensity = nv;
+                    if a.cfg.temp == 4 {
+                        a.cfg.temp = 1;
+                    }
                     apply_tint(a);
                     save_cfg(&a.cfg);
                     refresh_main(a);
+                }
+            }
+            if let Some((ox, oy)) = a.drag {
+                // 屏幕坐标抓取式拖动：窗口位置 = 光标 - 按下时偏移，无累积、无正反馈
+                let mut pt = POINT::default();
+                if GetCursorPos(&mut pt).is_ok() {
+                    let _ = SetWindowPos(
+                        h,
+                        HWND_TOP,
+                        pt.x - ox,
+                        pt.y - oy,
+                        0,
+                        0,
+                        SWP_NOSIZE | SWP_NOACTIVATE,
+                    );
                 }
             }
             LRESULT(0)
         }
         WM_LBUTTONUP => {
             a.mouse_down = false;
+            if a.drag.is_some() {
+                let _ = ReleaseCapture();
+            }
+            a.drag = None;
             LRESULT(0)
+        }
+        WM_CAPTURECHANGED => {
+            // 捕获被系统收回（切焦点/Alt+F4 等）时，清掉拖动标记，防止残留
+            if a.drag.is_some() {
+                a.drag = None;
+            }
+            DefWindowProcW(h, m, w, l)
         }
         WM_CLOSE => {
             let _ = ShowWindow(h, SW_HIDE);
@@ -1098,7 +1169,7 @@ fn main_menu(a: &mut App) {
             None => return,
         };
         let ins = |id: u32, text: &str, check: bool| {
-            let t = u16s(text);
+            let t = u16z(text);
             let flags = MENU_ITEM_FLAGS(MF_STRING.0 | if check { MF_CHECKED.0 } else { 0 });
             let _ = AppendMenuW(m, flags, id as usize, PCWSTR(t.as_ptr()));
         };
@@ -1126,10 +1197,10 @@ fn main_menu(a: &mut App) {
                     save_cfg(&a.cfg);
                 }
                 CM_SYSNIGHT => {
-                    let u16 = "ms-settings:nightlight".encode_utf16().collect::<Vec<u16>>();
+                    let u16 = "ms-settings:nightlight".encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
                     let _ = ShellExecuteW(
                         a.main_w,
-                        PCWSTR("open".encode_utf16().collect::<Vec<u16>>()[..].as_ptr()),
+                        PCWSTR("open".encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>()[..].as_ptr()),
                         PCWSTR(u16.as_ptr()),
                         None,
                         None,
@@ -1234,7 +1305,7 @@ fn tray_menu(a: &mut App) {
         const MI_ABOUT: u32 = 6;
         const MI_EXIT: u32 = 7;
         let ins = |id: u32, text: &str| {
-            let t = u16s(text);
+            let t = u16z(text);
             let _ = AppendMenuW(m, MENU_ITEM_FLAGS(MF_STRING.0), id as usize, PCWSTR(t.as_ptr()));
         };
         ins(MI_SHOW, "打开主窗口");
@@ -1243,7 +1314,8 @@ fn tray_menu(a: &mut App) {
         ins(MI_NIGHT, if a.cfg.auto_time { "夜间助眠：开" } else { "夜间助眠：关" });
         ins(MI_BOOT, if a.cfg.autostart { "开机自启：开" } else { "开机自启：关" });
         ins(MI_ABOUT, "关于");
-        ins(MI_EXIT, "退出");
+        let _ = AppendMenuW(m, MENU_ITEM_FLAGS(MF_SEPARATOR.0), 0, PCWSTR(std::ptr::null()));
+        ins(MI_EXIT, "退出 sdz-ce");
         let _ = SetForegroundWindow(a.hidden);
         let mut pt = POINT::default();
         let _ = GetCursorPos(&mut pt);
@@ -1292,10 +1364,10 @@ fn tray_menu(a: &mut App) {
                     save_cfg(&a.cfg);
                 }
                 MI_ABOUT => {
-                    let msg = u16s(
+                    let msg = u16z(
                         "sdz-ce 0.1.0\n护眼：DWM 暖色调色层（不修改系统 gamma，零残留）\n休息：20-20-20 提醒\n\n热键：F9 开/关　F8 休息　F5 主窗口",
                     );
-                    let cap = u16s("关于 sdz-ce");
+                    let cap = u16z("关于 sdz-ce");
                     MessageBoxW(None, PCWSTR(msg.as_ptr()), PCWSTR(cap.as_ptr()), MB_OK);
                 }
                 MI_EXIT => {
@@ -1312,10 +1384,15 @@ fn u16s(s: &str) -> Vec<u16> {
     s.encode_utf16().collect()
 }
 
+/// 带 NUL 结尾的 UTF-16 字符串，专供需要 PCWSTR（以 \0 结尾）的 Win32 API 使用
+fn u16z(s: &str) -> Vec<u16> {
+    s.encode_utf16().chain(std::iter::once(0)).collect()
+}
+
 // ---------------- 创建主窗口 ----------------
 fn create_main(a: &mut App) {
     unsafe {
-        let cls = CLASS_MAIN.encode_utf16().collect::<Vec<u16>>();
+        let cls = CLASS_MAIN.encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
         let wc = WNDCLASSW {
             lpfnWndProc: Some(wnd_main),
             hInstance: hinst(),
@@ -1324,14 +1401,14 @@ fn create_main(a: &mut App) {
             ..Default::default()
         };
         let _ = RegisterClassW(&wc);
-        let title = u16s("sdz-ce 护眼");
+        let title = u16z("sdz-ce 护眼");
         let x = (GetSystemMetrics(SM_CXSCREEN) - WIN_W) / 2;
         let y = (GetSystemMetrics(SM_CYSCREEN) - WIN_H) / 3;
         a.main_w = CreateWindowExW(
             WINDOW_EX_STYLE(0),
             PCWSTR(cls.as_ptr()),
             PCWSTR(title.as_ptr()),
-            WINDOW_STYLE(WS_CAPTION.0 | WS_SYSMENU.0),
+            WINDOW_STYLE(WS_POPUP.0 | WS_CLIPSIBLINGS.0),
             x,
             y,
             WIN_W,
@@ -1343,6 +1420,14 @@ fn create_main(a: &mut App) {
         )
         .unwrap_or_default();
         if !a.main_w.is_invalid() {
+            // Win11 无边框圆角
+            let pref = DWMWCP_ROUND;
+            let _ = DwmSetWindowAttribute(
+                a.main_w,
+                DWMWA_WINDOW_CORNER_PREFERENCE,
+                &pref as *const DWM_WINDOW_CORNER_PREFERENCE as *const core::ffi::c_void,
+                std::mem::size_of::<DWM_WINDOW_CORNER_PREFERENCE>() as u32,
+            );
             let _ = ShowWindow(a.main_w, SW_SHOWNORMAL);
         }
     }
@@ -1360,8 +1445,8 @@ fn main() {
             .collect();
         if let Ok(m) = CreateMutexW(None, TRUE, PCWSTR(name.as_ptr())) {
             if GetLastError() == ERROR_ALREADY_EXISTS {
-                let msg = u16s("sdz-ce 已在运行：请查看任务栏右下角托盘图标（点 ^ 展开），或按 F5 打开窗口。");
-                let cap = u16s("sdz-ce");
+                let msg = u16z("sdz-ce 已在运行：请查看任务栏右下角托盘图标（点 ^ 展开），或按 F5 打开窗口。");
+                let cap = u16z("sdz-ce");
                 MessageBoxW(None, PCWSTR(msg.as_ptr()), PCWSTR(cap.as_ptr()), MB_OK);
                 return;
             }
@@ -1378,9 +1463,10 @@ fn main() {
             in_break: false,
             hud_left: 0,
             mouse_down: false,
+            drag: None,
         };
 
-        let cls = CLASS_HIDDEN.encode_utf16().collect::<Vec<u16>>();
+        let cls = CLASS_HIDDEN.encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
         let wc = WNDCLASSW {
             lpfnWndProc: Some(wnd_hidden),
             hInstance: hinst(),
@@ -1397,7 +1483,7 @@ fn main() {
             0,
             0,
             0,
-            HWND_MESSAGE,
+            None,
             None,
             hinst(),
             None,
