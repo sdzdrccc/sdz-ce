@@ -184,6 +184,9 @@ struct App {
 }
 
 static mut APP: *mut App = ptr::null_mut();
+static mut MUTEX: windows::Win32::Foundation::HANDLE = windows::Win32::Foundation::HANDLE(
+    std::ptr::null_mut(),
+);
 
 #[allow(static_mut_refs)]
 
@@ -887,12 +890,17 @@ fn main() {
     unsafe {
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2).ok();
 
-        // 单实例
-        let name = u16s("Local\\sdz-ce_mutex");
-        if let Ok(_m) = CreateMutexW(None, TRUE, PCWSTR(name.as_ptr())) {
+        // 单实例：句柄必须保存到进程结束，否则互斥体随 Drop 关闭、多开会失效
+        // 互斥体名字必须 NUL 结尾（Windows API 字符串）
+        let name: Vec<u16> = "Local\\sdz-ce_mutex".encode_utf16().chain(std::iter::once(0)).collect();
+        if let Ok(m) = CreateMutexW(None, TRUE, PCWSTR(name.as_ptr())) {
             if GetLastError() == ERROR_ALREADY_EXISTS {
+                let msg = u16s("sdz-ce 已经在运行：请到任务栏右下角托盘查看图标（点 ^ 展开隐藏图标）。");
+                let cap = u16s("sdz-ce");
+                MessageBoxW(None, PCWSTR(msg.as_ptr()), PCWSTR(cap.as_ptr()), MB_OK);
                 return;
             }
+            MUTEX = m;
         }
 
         let mut app = App {
@@ -937,7 +945,22 @@ fn main() {
         create_hud(a);
 
         let _ = Shell_NotifyIconW(NIM_ADD, &tray_data(a));
-        SetTimer(a.hidden, TIMER_IDLE as usize, 10_000, None);
+        {
+            let flag_dir = std::env::var("APPDATA")
+                .map(std::path::PathBuf::from)
+                .unwrap_or_default()
+                .join("sdz-ce");
+            let flag = flag_dir.join("started.flag");
+            if !flag.exists() {
+                let _ = std::fs::create_dir_all(&flag_dir);
+                let _ = std::fs::write(&flag, "1");
+                let msg = u16s(
+                    "sdz-ce 已启动：它运行在系统托盘（任务栏右下角，点 ^ 展开隐藏图标区查看图标）。\n热键：F9 开/关护眼　F8 立即休息　F5 打开设置",
+                );
+                let cap = u16s("sdz-ce");
+                MessageBoxW(None, PCWSTR(msg.as_ptr()), PCWSTR(cap.as_ptr()), MB_OK);
+            }
+        }        SetTimer(a.hidden, TIMER_IDLE as usize, 10_000, None);
 
         RegisterHotKey(a.hidden, HK_TOGGLE, MOD_NOREPEAT, 0x78).ok(); // F9
         RegisterHotKey(a.hidden, HK_BREAK, MOD_NOREPEAT, 0x77).ok();  // F8
