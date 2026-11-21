@@ -26,61 +26,70 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 
 // ---------------- 布局常量 ----------------
 const WIN_W: i32 = 480;
-const WIN_H: i32 = 270;
+const WIN_H: i32 = 285;
 
-const SIDE_W: i32 = 46;
-const SIDE_H1: i32 = 12;
-const SIDE_H2: i32 = 44;
-const SIDE_H3: i32 = 76;
-const SIDE_H4: i32 = 108;
+// 侧栏（参照 90px 宽 ×0.75）；三个导航块 (y0,y1)
+const SIDE_W: i32 = 67;
+const NAV_EYE: (i32, i32) = (45, 106);
+const NAV_HEALTH: (i32, i32) = (106, 172);
+const NAV_ABOUT: (i32, i32) = (172, 233);
 
-const MENU_X0: i32 = 448;
-const MENU_X1: i32 = 462;
-const CLOSE_X0: i32 = 465;
-const CLOSE_X1: i32 = 479;
-const TOP_Y0: i32 = 6;
-const TOP_Y1: i32 = 22;
+// 右上角 ☰ / ✕
+const MENU_X0: i32 = 431;
+const MENU_X1: i32 = 445;
+const CLOSE_X0: i32 = 452;
+const CLOSE_X1: i32 = 466;
+const TOP_Y0: i32 = 8;
+const TOP_Y1: i32 = 30;
 
-const RING_CX: i32 = 263;
-const RING_CY: i32 = 74;
-const RING_R: i32 = 31;
-const STATUS_Y: i32 = 122;
+// 内容中心 x（眼睛环中心）
+const CX: i32 = 263;
 
-const SL_X0: i32 = 133;
-const SL_X1: i32 = 393;
-const SL_Y: i32 = 150;
+// 眼睛徽章（emblem.bmp 188×188，显示 63×63，环中心对齐 CX）
+const EMB_SZ: i32 = 63;
+const EMB_X: i32 = CX - EMB_SZ / 2;
+const EMB_Y: i32 = 24;
+const STATUS_Y: i32 = 104;
 
-const LABEL_COLOR_Y: i32 = 176;
-const TOG_LBL_X: i32 = 340;
-const TOG_X: i32 = 388;
-const TOG_Y: i32 = 174;
-const TOG_W: i32 = 23;
-const TOG_H: i32 = 12;
+// 滑条（青→绿→黄渐变）
+const SL_X0: i32 = 117;
+const SL_X1: i32 = 316;
+const SL_Y: i32 = 129;
 
-const CIRCLE_Y: i32 = 212;
-const CIRCLE_R: i32 = 8;
-const CIRCLE_XS: [i32; 5] = [153, 208, 263, 318, 373];
-const CAPTION_Y: i32 = 239;
+// 标签行 + 夜间开关
+const LABEL_Y: i32 = 164;
+const TOG_LBL_X: i32 = 352;
+const TOG_X: i32 = 456;
+const TOG_Y: i32 = 168;
+const TOG_W: i32 = 25;
+const TOG_H: i32 = 13;
 
+// 5 色圆点
+const CIRCLE_Y: i32 = 207;
+const CIRCLE_R: i32 = 7;
+const CIRCLE_XS: [i32; 5] = [150, 213, 267, 322, 381];
+const CAPTION_Y: i32 = 234;
+
+// 健康页
 const HP_ROW1_Y: i32 = 60;
-const HP_ROW2_Y: i32 = 95;
-const HP_ROW3_Y: i32 = 130;
-const HP_VAL_X: i32 = 260;
+const HP_ROW2_Y: i32 = 110;
+const HP_ROW3_Y: i32 = 160;
+const HP_VAL_X: i32 = 330;
 
 // 健康页数值循环
 const REST_VALUES: [u8; 5] = [5, 10, 20, 30, 60];
 const FOCUS_VALUES: [u8; 5] = [10, 20, 30, 45, 60];
 
-// ---------------- 颜色（浅黄暖调界面） ----------------
-const TEAL: COLORREF = COLORREF(0x0019A3E9); // #E9A319 琥珀（侧栏/主色）
-const MAIN_BG: COLORREF = COLORREF(0x00E3F6FD); // #FDF6E3 奶油浅黄底
-const WHITE: COLORREF = COLORREF(0x00ECFBFF); // #FFFBEC 暖白
-const TEXT_DARK: COLORREF = COLORREF(0x001E3B4A); // #4A3B1E 深棕
-const TEXT_GRAY: COLORREF = COLORREF(0x005F8A9A); // #9A8A5F 暖灰
-const GREEN: COLORREF = COLORREF(0x004C8A2E); // #2E8A4C
-const RING_BG: COLORREF = COLORREF(0x00C8E4F0); // #F0E4C8 浅黄
-const LINE_GRAY: COLORREF = COLORREF(0x00A8D5E6); // #E6D5A8 暖线
-const SL_YEL: COLORREF = COLORREF(0x00107AC4); // #C47A10 深琥珀（滑条末端）
+// ---------------- 颜色（护眼宝青色系，参照原 exe 实测取色） ----------------
+// COLORREF = 0x00BBGGRR
+const TEAL: COLORREF = COLORREF(0x00ABB64F); // #4FB6AB 主青（侧栏/圆环/开关）
+const TEAL_DARK: COLORREF = COLORREF(0x00555B27); // #275B55 侧栏选中深块
+const MAIN_BG: COLORREF = COLORREF(0x00EBEBEB); // #EBEBEB 浅灰内容底
+const WHITE: COLORREF = COLORREF(0x00FFFFFF);
+const TEXT_DARK: COLORREF = COLORREF(0x00343434); // #343434 正文
+const TEXT_GRAY: COLORREF = COLORREF(0x009A9A9A); // #9A9A9A 副文字
+const LINE_GRAY: COLORREF = COLORREF(0x00C8C8C8); // 未填充轨道/线
+const SL_YEL: COLORREF = COLORREF(0x004AE8E0); // #E0E84A 滑条末端黄
 const CIRCLE_DARK: COLORREF = COLORREF(0x00141414);
 
 // 色温圆点（0 淡黄 / 1 黄 / 2 绿 / 3 橙红 / 4 黑=关闭）—— 真正叠加到屏幕的护眼色，保持不变
@@ -210,6 +219,7 @@ struct App {
     tint: HWND,
     hud: HWND,
     main_w: HWND,
+    emblem: HBITMAP,
     cfg: Cfg,
     page: u8,
     in_break: bool,
@@ -683,64 +693,156 @@ fn fill_rect(hdc: HDC, x: i32, y: i32, w: i32, h: i32, color: COLORREF) {
     }
 }
 
+// 眼睛徽章：嵌入的 32bpp BMP（从参照 exe 切出的眼睛+双环，188×188），GDI 解析
+const EMBLEM_BMP: &[u8] = include_bytes!("assets/emblem.bmp");
+
+/// 解析嵌入的 32bpp BMP → HBITMAP（CreateDIBSection，top-down 负高度）
+fn load_emblem() -> HBITMAP {
+    unsafe {
+        let d = EMBLEM_BMP;
+        if d.len() < 54 || &d[0..2] != b"BM" {
+            return HBITMAP::default();
+        }
+        let offset = u32::from_le_bytes(d[10..14].try_into().unwrap_or([0u8; 4])) as usize;
+        let w = i32::from_le_bytes(d[18..22].try_into().unwrap_or([0u8; 4])).abs() as u32;
+        let h = i32::from_le_bytes(d[22..26].try_into().unwrap_or([0u8; 4])).abs() as u32;
+        let bitcount = u16::from_le_bytes(d[28..30].try_into().unwrap_or([0u8; 2]));
+        if w == 0 || h == 0 || bitcount != 32 {
+            return HBITMAP::default();
+        }
+        if offset + (w * h * 4) as usize > d.len() {
+            return HBITMAP::default();
+        }
+        let src_top_down = i32::from_le_bytes(d[22..26].try_into().unwrap_or([0u8; 4])) < 0;
+        let stride = w * 4;
+
+        let mut bmi = BITMAPINFO::default();
+        bmi.bmiHeader.biSize = 40;
+        bmi.bmiHeader.biWidth = w as i32;
+        bmi.bmiHeader.biHeight = -(h as i32); // top-down
+        bmi.bmiHeader.biPlanes = 1;
+        bmi.bmiHeader.biBitCount = 32;
+        bmi.bmiHeader.biCompression = 0;
+
+        let mut ppv: *mut core::ffi::c_void = core::ptr::null_mut();
+        let hdc = CreateCompatibleDC(None);
+        if hdc.is_invalid() {
+            return HBITMAP::default();
+        }
+        let bm = match CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, &mut ppv, None, 0) {
+            Ok(bm) => bm,
+            Err(_) => {
+                let _ = DeleteDC(hdc);
+                return HBITMAP::default();
+            }
+        };
+        let _ = DeleteDC(hdc);
+        if ppv.is_null() {
+            return HBITMAP::default();
+        }
+        // 把 BMP 像素写进 GDI 分配的内存（top-down：源行序归一化）
+        let base = ppv as *mut u8;
+        for row in 0..h {
+            let src_row = if src_top_down { row } else { h - 1 - row };
+            for col in 0..w {
+                let si = offset + ((src_row * stride + col * 4) as usize);
+                let di = (row * stride + col * 4) as usize;
+                for k in 0..4 {
+                    *base.add(di + k) = d[si + k];
+                }
+            }
+        }
+        bm
+    }
+}
+
+/// 把 emblem（188×188）缩放到 EMB_SZ×EMB_SZ 贴到 (x,y)（HALFTONE 缩放 + 抗锯齿）
+fn blit_emblem(hdc: HDC, a: &App, x: i32, y: i32) {
+    if a.emblem.is_invalid() {
+        return;
+    }
+    unsafe {
+        let mem = CreateCompatibleDC(hdc);
+        if mem.is_invalid() {
+            return;
+        }
+        let old = SelectObject(mem, a.emblem);
+        let _ = SetStretchBltMode(mem, STRETCH_HALFTONE);
+        let _ = StretchBlt(
+            hdc,
+            x,
+            y,
+            EMB_SZ,
+            EMB_SZ,
+            mem,
+            0,
+            0,
+            188,
+            188,
+            SRCCOPY,
+        );
+        let _ = SelectObject(mem, old);
+        let _ = DeleteDC(mem);
+    }
+}
+
 // ---------------- 主窗口绘制 ----------------
 fn draw_main(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_big: HFONT, f_pct: HFONT) {
     unsafe {
         fill_rect(hdc, 0, 0, WIN_W, WIN_H, MAIN_BG);
         fill_rect(hdc, 0, 0, SIDE_W, WIN_H, TEAL);
-        fill_rect(hdc, 0, 0, SIDE_W, 24, COLORREF(lerp_color(TEAL.0, 0u32, 0.12)));
 
-        // 侧栏三项
+        // 侧栏三项：护眼/健康/关于（选中项深块 + 白色图标文字）
         let items: [(u8, &str); 3] = [(0, "护眼"), (1, "健康"), (2, "关于")];
         for (idx, label) in items {
             let (y0, y1) = match idx {
-                0 => (SIDE_H1, SIDE_H2),
-                1 => (SIDE_H2, SIDE_H3),
-                _ => (SIDE_H3, SIDE_H4),
+                0 => NAV_EYE,
+                1 => NAV_HEALTH,
+                _ => NAV_ABOUT,
             };
             let active = a.page == idx;
             if active {
-                fill_rect(hdc, 0, y0, SIDE_W, y1 - y0, WHITE);
+                fill_rect(hdc, 0, y0, SIDE_W, y1 - y0, TEAL_DARK);
             }
-            let icx = 13i32;
-            let icy = y0 + 11;
-            let col_pen = if active { TEAL } else { COLORREF(0x004A8AB0) }; // #B08A4A 暖棕
-            let oldp = pen_w(hdc, 1, col_pen);
+            let icx = 24i32;
+            let icy = (y0 + y1) / 2;
+            let col_pen = WHITE;
+            let oldp = pen_w(hdc, 2, col_pen);
             match idx {
                 0 => {
-                    let _ = Ellipse(hdc, icx - 5, icy - 4, icx + 5, icy + 4);
+                    let _ = Ellipse(hdc, icx - 6, icy - 5, icx + 6, icy + 5);
                     let _ = Ellipse(hdc, icx - 2, icy - 2, icx + 2, icy + 2);
                 }
                 1 => {
-                    let _ = Ellipse(hdc, icx - 4, icy - 4, icx + 4, icy + 4);
-                    draw_arc_poly(hdc, icx, icy + 1, 2, 30.0, 120.0);
+                    let _ = Ellipse(hdc, icx - 5, icy - 5, icx + 5, icy + 5);
+                    draw_arc_poly(hdc, icx, icy + 1, 3, 20.0, 140.0);
                 }
                 _ => {
-                    let _ = Ellipse(hdc, icx - 3, icy - 5, icx + 3, icy);
-                    let _ = Ellipse(hdc, icx - 4, icy + 1, icx + 4, icy + 6);
+                    let _ = Ellipse(hdc, icx - 3, icy - 6, icx + 3, icy - 1);
+                    let _ = Ellipse(hdc, icx - 5, icy + 1, icx + 5, icy + 7);
                 }
             }
             let _ = oldp;
-            let tcol = if active { TEXT_DARK } else { WHITE };
+            let tcol = WHITE;
             let t = u16s(label);
             let _ = SetTextColor(hdc, tcol);
             let _ = SetBkMode(hdc, TRANSPARENT);
-            let oldf = SelectObject(hdc, f_small);
-            let _ = TextOutW(hdc, 22, icy - 5, &t);
+            let oldf = SelectObject(hdc, f_med);
+            let _ = TextOutW(hdc, 38, icy - 6, &t);
             let _ = SelectObject(hdc, oldf);
         }
 
         // 右上角 ☰ / ✕
-        let oldp = pen_w(hdc, 1, TEXT_DARK);
+        let oldp = pen_w(hdc, 2, TEXT_DARK);
         for i in 0..3 {
-            let yy = 9 + i * 4;
-            let _ = MoveToEx(hdc, MENU_X0 + 4, yy, None);
-            let _ = LineTo(hdc, MENU_X1 - 4, yy);
+            let yy = TOP_Y0 + 4 + i * 5;
+            let _ = MoveToEx(hdc, MENU_X0 + 2, yy, None);
+            let _ = LineTo(hdc, MENU_X1 - 2, yy);
         }
-        let _ = MoveToEx(hdc, CLOSE_X0 + 4, 9, None);
-        let _ = LineTo(hdc, CLOSE_X1 - 4, 19);
-        let _ = MoveToEx(hdc, CLOSE_X0 + 4, 19, None);
-        let _ = LineTo(hdc, CLOSE_X1 - 4, 9);
+        let _ = MoveToEx(hdc, CLOSE_X0 + 2, TOP_Y0 + 4, None);
+        let _ = LineTo(hdc, CLOSE_X1 - 2, TOP_Y1 - 4);
+        let _ = MoveToEx(hdc, CLOSE_X0 + 2, TOP_Y1 - 4, None);
+        let _ = LineTo(hdc, CLOSE_X1 - 2, TOP_Y0 + 4);
         let _ = oldp;
 
         match a.page {
@@ -757,41 +859,32 @@ fn draw_main(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT, f_big: HFONT, f_pc
     }
 }
 
-fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, _f_med: HFONT, f_pct: HFONT) {
+fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, _f_med: HFONT, _f_pct: HFONT) {
     unsafe {
-        // 环形百分比
-        let active = is_tinting(a);
-        let pct = if active { a.cfg.intensity } else { 0 };
-        let oldp = pen_w(hdc, 4, RING_BG);
-        let _ = Ellipse(
-            hdc,
-            RING_CX - RING_R,
-            RING_CY - RING_R,
-            RING_CX + RING_R,
-            RING_CY + RING_R,
-        );
-        let _ = oldp;
-        if pct > 0 {
-            let oldp2 = pen_w(hdc, 4, TEAL);
-            draw_arc_poly(hdc, RING_CX, RING_CY, RING_R, 270.0, 360.0 * (pct as f32) / 100.0);
-            let _ = oldp2;
-        }
-        let pct_s = format!("{}%", a.cfg.intensity);
-        text_center(hdc, f_pct, RING_CX, RING_CY - 9, &pct_s, TEXT_DARK);
+        // 眼睛徽章（嵌入 BMP 贴图，抗锯齿缩放）
+        blit_emblem(hdc, a, EMB_X, EMB_Y);
 
-        // 状态
+        // 状态文字（teal，前置小点 + 下划线，贴合参照）
+        let active = is_tinting(a);
         let st = status_text(a);
-        let st_col = if active { GREEN } else { TEXT_GRAY };
+        let st_col = if active { TEAL } else { TEXT_GRAY };
         let st_w = text_width(hdc, f_small, st);
-        text_center(hdc, f_small, RING_CX, STATUS_Y, st, st_col);
-        let dotx = RING_CX - st_w / 2 - 11;
+        let st_x = CX - st_w / 2;
+        text_center(hdc, f_small, CX, STATUS_Y, st, st_col);
+        // 前置圆点
+        let dotx = st_x - 10;
         let ob = CreateSolidBrush(st_col);
         let sb = SelectObject(hdc, ob);
-        let _ = Ellipse(hdc, dotx, STATUS_Y + 4, dotx + 5, STATUS_Y + 9);
+        let _ = Ellipse(hdc, dotx, STATUS_Y + 6, dotx + 6, STATUS_Y + 12);
         let _ = SelectObject(hdc, sb);
         let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
+        // 下划线
+        let oldp = pen_w(hdc, 1, st_col);
+        let _ = MoveToEx(hdc, st_x, STATUS_Y + 17, None);
+        let _ = LineTo(hdc, st_x + st_w, STATUS_Y + 17);
+        let _ = oldp;
 
-        // 滑条（青→黄渐变）
+        // 滑条（青→绿→黄渐变）
         let val = a.cfg.intensity as i32;
         let total = SL_X1 - SL_X0;
         let handle_x = SL_X0 + total * val / 100;
@@ -826,9 +919,9 @@ fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, _f_med: HFONT, f_pct: HFONT)
         let _ = SelectObject(hdc, sb);
         let _ = DeleteObject(HGDIOBJ(ob.0 as *mut _));
 
-        // 标签
-        draw_text(hdc, f_small, SL_X0, LABEL_COLOR_Y, "颜色调节", TEXT_DARK);
-        draw_text(hdc, f_small, TOG_LBL_X, LABEL_COLOR_Y, "夜间助眠", TEXT_DARK);
+        // 标签 + 夜间开关
+        draw_text(hdc, f_small, SL_X0, LABEL_Y, "颜色调节", TEXT_DARK);
+        draw_text(hdc, f_small, TOG_LBL_X, LABEL_Y, "夜间助眠", TEXT_DARK);
         draw_toggle(hdc, TOG_X, TOG_Y, a.cfg.auto_time);
 
         // 五个色圆
@@ -862,7 +955,7 @@ fn draw_page_eye(a: &App, hdc: HDC, f_small: HFONT, _f_med: HFONT, f_pct: HFONT)
         } else {
             "点击圆点切换护眼颜色，黑色为关闭"
         };
-        text_center(hdc, f_small, RING_CX, CAPTION_Y, cap, TEXT_GRAY);
+        text_center(hdc, f_small, CX, CAPTION_Y, cap, TEXT_GRAY);
     }
 }
 
@@ -912,7 +1005,7 @@ fn draw_page_health(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
     text_center(
         hdc,
         f_small,
-        RING_CX,
+        CX,
         175,
         "点击数值可循环切换：休息 5/10/20/30/60 分钟，阈值 10/20/30/45/60 分钟",
         TEXT_GRAY,
@@ -920,7 +1013,7 @@ fn draw_page_health(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
     text_center(
         hdc,
         f_small,
-        RING_CX,
+        CX,
         192,
         "提醒时出现全屏倒计时，建议闭眼或远眺 20 秒",
         TEXT_GRAY,
@@ -940,7 +1033,7 @@ fn draw_page_about(a: &App, hdc: HDC, f_small: HFONT, f_med: HFONT) {
     for (i, l) in lines.iter().enumerate() {
         draw_text(hdc, f_small, 100, 80 + i as i32 * 16, l, TEXT_GRAY);
     }
-    text_center(hdc, f_small, RING_CX, 190, "基于 Windows 10/11，普通用户权限运行", TEXT_GRAY);
+    text_center(hdc, f_small, CX, 190, "基于 Windows 10/11，普通用户权限运行", TEXT_GRAY);
 }
 
 // ---------------- 主窗口命中 ----------------
@@ -953,9 +1046,9 @@ fn hit_main(a: &App, x: i32, y: i32) -> u32 {
     }
     if x < SIDE_W {
         return match y {
-            y if (y >= SIDE_H1 && y < SIDE_H2) => HIT_PAGE_EYE,
-            y if (y >= SIDE_H2 && y < SIDE_H3) => HIT_PAGE_HEALTH,
-            y if (y >= SIDE_H3 && y < SIDE_H4) => HIT_PAGE_ABOUT,
+            y if (y >= NAV_EYE.0 && y < NAV_EYE.1) => HIT_PAGE_EYE,
+            y if (y >= NAV_HEALTH.0 && y < NAV_HEALTH.1) => HIT_PAGE_HEALTH,
+            y if (y >= NAV_ABOUT.0 && y < NAV_ABOUT.1) => HIT_PAGE_ABOUT,
             _ => HIT_NONE,
         };
     }
@@ -1458,6 +1551,7 @@ fn main() {
             tint: HWND::default(),
             hud: HWND::default(),
             main_w: HWND::default(),
+            emblem: load_emblem(),
             cfg: load_cfg(),
             page: 0,
             in_break: false,
@@ -1525,5 +1619,8 @@ fn main() {
         let _ = DestroyWindow(a.tint);
         let _ = DestroyWindow(a.hud);
         let _ = DestroyWindow(a.main_w);
+        if !a.emblem.is_invalid() {
+            let _ = DeleteObject(HGDIOBJ(a.emblem.0 as *mut _));
+        }
     }
 }
